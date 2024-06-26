@@ -40,7 +40,6 @@ const getGif = () => {
       return response.json();
     })
     .then((response) => {
-      console.log(response.data);
       if (response.data.length === 0) {
         throw new Error('GIF Not Found');
       }
