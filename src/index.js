@@ -31,7 +31,7 @@ const getGif = async () => {
     );
     // Check response
     if (!response.ok) {
-      throw new Error(response.status);
+      throw new Error(`${response.status} ${response.statusText}`);
     }
     // Extract data
     const gifData = await response.json();
