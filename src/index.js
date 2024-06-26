@@ -12,49 +12,56 @@ const getData = () => {
   return encoded;
 };
 
-const handleResponse = (response) => {
+const displayGif = (response) => {
   img.src = response.data.images.original.url;
 };
 
 const handleError = (error) => {
-  if (getData() === '') {
-    errorMsg.textContent = "You've searched nothing";
-    img.src =
-      'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExMjFhdnc2Zmdzems0a2RnNnRpYjFhdnQwbmxkdTY4cHk5dWk4b2pnYyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/f4DGnGf6xwFonJUI0D/giphy.gif';
-  } else {
-    errorMsg.textContent = error;
-    img.src =
-      'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExcGl1NzFmb2Z5MWl2MzF6NDAzdDdmaHR1ZjRwcndubWRoZHNpenRoNiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/vKz8r5aTUFFJu/giphy.gif';
-  }
+  errorMsg.textContent = error;
+  img.src =
+    'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExcGl1NzFmb2Z5MWl2MzF6NDAzdDdmaHR1ZjRwcndubWRoZHNpenRoNiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/vKz8r5aTUFFJu/giphy.gif';
 };
 
-const getGif = () => {
-  fetch(
-    `https://api.giphy.com/v1/gifs/translate?api_key=tc9YKXRZLVTOZ2yw9L0nDU9zCpWXdHRi&s=${getData()}`,
-    { mode: 'cors' }
-  )
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error(response.status);
-      }
-      return response.json();
-    })
-    .then((response) => {
-      if (response.data.length === 0) {
-        throw new Error('GIF Not Found');
-      }
-      handleResponse(response);
-    })
-    .catch((error) => {
-      handleError(error);
-    });
+const getGif = async () => {
+  try {
+    // Retrieve data
+    const response = await fetch(
+      `https://api.giphy.com/v1/gifs/translate?api_key=tc9YKXRZLVTOZ2yw9L0nDU9zCpWXdHRi&s=${getData()}`,
+      { mode: 'cors' }
+    );
+    // Check response
+    if (!response.ok) {
+      throw new Error(response.status);
+    }
+    // Extract data
+    const gifData = await response.json();
+    // Check for no gif found error
+    if (gifData.data.length === 0) {
+      throw new Error('GIF Not Found');
+    }
+    // Display data
+    displayGif(gifData);
+  } catch (error) {
+    handleError(error);
+  }
 };
 
 const clearError = () => {
   errorMsg.textContent = '';
 };
 
+const handleFetchRequest = () => {
+  const inputVal = document.querySelector('#search-gif').value;
+  if (inputVal === '') {
+    errorMsg.textContent = 'Enjoy your meal.';
+    img.src =
+      'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExMjFhdnc2Zmdzems0a2RnNnRpYjFhdnQwbmxkdTY4cHk5dWk4b2pnYyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/f4DGnGf6xwFonJUI0D/giphy.gif';
+  } else {
+    clearError();
+    getGif();
+  }
+};
+
 fetchButton.addEventListener('click', () => {
-  clearError();
-  getGif();
+  handleFetchRequest();
 });
